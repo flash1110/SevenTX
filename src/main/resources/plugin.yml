@@ -5,9 +5,21 @@ main: me.flash1110.seventx.SevenTX
 description: SevenTX plugin coded by Flash
 
 commands:
-  createclan:
+  clancreate:
     description: Create a clan
     usage: /<command> [name]
+  clankick:
+    description: Kick someone
+    usage: /<command> [player]
+  clantag:
+    description: Change the tag of a clan
+    usage: /<command> [clan] [tag]
+  clanjoin:
+    description: Join a clan
+    usage: /<command> [clan]
+  clanleader:
+    description: Make someone else the leader
+    usage: /<command> [clan] [leader]
 
 permissions:
   seventx.create:
