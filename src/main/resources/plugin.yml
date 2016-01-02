@@ -20,6 +20,9 @@ commands:
   clanleader:
     description: Make someone else the leader
     usage: /<command> [clan] [leader]
+  claninvite:
+    description: Invite a player
+    usage: /<command> [player]
 
 permissions:
   seventx.create:
