@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SevenTX:jar">
+    <output-path>$PROJECT_DIR$/../../../SevenTX_jar</output-path>
+    <root id="archive" name="SevenTX.jar">
+      <element id="module-output" name="SevenTX" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/spigotmc/spigot/1.8-R0.1-SNAPSHOT/spigot-1.8-R0.1-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/bukkit/craftbukkit/1.8-R0.1-SNAPSHOT/craftbukkit-1.8-R0.1-SNAPSHOT.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

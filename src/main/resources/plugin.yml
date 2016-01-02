@@ -1,0 +1,15 @@
+name: SevenTX
+author: flash1110
+version: 1.0
+main: me.flash1110.seventx.SevenTX
+description: SevenTX plugin coded by Flash
+
+commands:
+  createclan:
+    description: Create a clan
+    usage: /<command> [name]
+
+permissions:
+  seventx.create:
+    description: Create a clan
+    default: op

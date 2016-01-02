@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="Maven: org.bukkit:craftbukkit:1.8-R0.1-SNAPSHOT">
+    <archive path="/Users/sandleraj/.m2/repository/org/bukkit/craftbukkit/1.8-R0.1-SNAPSHOT/craftbukkit-1.8-R0.1-SNAPSHOT.jar" />
+  </library>
+  <library name="Maven: org.spigotmc:spigot:1.8-R0.1-SNAPSHOT">
+    <archive path="/Users/sandleraj/.m2/repository/org/spigotmc/spigot/1.8-R0.1-SNAPSHOT/spigot-1.8-R0.1-SNAPSHOT.jar" />
+  </library>
+</eclipse-userlibraries>
+

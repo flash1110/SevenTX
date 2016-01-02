@@ -1,0 +1,14 @@
+MySQL:
+  HostName: localhost
+  Port: 8552
+  DataBaseName: minecraft
+  UserName: root
+  Password: password
+
+white:
+  points: 0
+
+light_green:
+  points: 1
+
+max-players: 5
