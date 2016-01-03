@@ -42,6 +42,7 @@ public class SevenTX extends JavaPlugin {
         getCommand("clantag").setExecutor(new ClanTag());
         getCommand("clanjoin").setExecutor(new ClanJoin());
         getCommand("clanleader").setExecutor(new ClanLeader());
+        getCommand("clandelete").setExecutor(new ClanDelete());
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
         ClanSave.startDelayedTasks();

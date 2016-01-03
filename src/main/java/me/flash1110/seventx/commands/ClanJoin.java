@@ -97,6 +97,7 @@ public class ClanJoin implements CommandExecutor {
 
         if (c.addMember(player.getUniqueId())) {
             player.sendMessage(ChatColor.GOLD + "You have successfully joined " + ChatColor.LIGHT_PURPLE + WordUtils.capitalizeFully(args[0]));
+            c.handleJoin(player);
 
             Player p = Bukkit.getPlayer(c.getLeader());
             if (p != null && p.isOnline())
@@ -109,6 +110,8 @@ public class ClanJoin implements CommandExecutor {
                 }
 
             }
+
+
         } else {
             player.sendMessage(ChatColor.GOLD + "There are already the max amount of players in that clan");
             return true;

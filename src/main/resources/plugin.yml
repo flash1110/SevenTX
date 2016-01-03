@@ -23,6 +23,9 @@ commands:
   claninvite:
     description: Invite a player
     usage: /<command> [player]
+  clandelete:
+    description: Delete a clan
+    usage: /<command> [clan]
 
 permissions:
   seventx.create:

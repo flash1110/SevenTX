@@ -43,6 +43,11 @@ public class ClanLeave implements CommandExecutor {
             return true;
         }
 
+        if (clan.getLeader().equals(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You must disband the clan to leave it");
+            return true;
+        }
+
         clan.removeMember(player.getUniqueId());
 
         player.sendMessage(ChatColor.GOLD + "You have successfully left your clan");
@@ -56,6 +61,8 @@ public class ClanLeave implements CommandExecutor {
             if (to != null && to.isOnline())
                 to.sendMessage(ChatColor.LIGHT_PURPLE + player.getDisplayName() + ChatColor.GOLD + " has left your clan");
         }
+
+        clan.handleLeave(player);
 
         return true;
     }

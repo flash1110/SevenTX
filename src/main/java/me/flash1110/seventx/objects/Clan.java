@@ -3,7 +3,6 @@ package me.flash1110.seventx.objects;
 import me.flash1110.seventx.SevenTX;
 import me.flash1110.seventx.enums.Colors;
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.sql.*;
@@ -50,7 +49,7 @@ public class Clan {
     }
 
     public Colors getColor() {
-        return Colors.getColorFromChat(ChatColor.valueOf(color));
+        return Colors.getColor(points);
     }
 
     public int getPoints() {
@@ -110,11 +109,6 @@ public class Clan {
         this.points -= SevenTX.INSTANCE.getPlayer(member) != null ? SevenTX.INSTANCE.getPlayer(member).getPoints() : 0;
     }
 
-    public String nextColor() {
-       this.color = Colors.next(getColor()).toString();
-        return this.color;
-    }
-
     public void addPoint() {
         this.points++;
     }
@@ -128,31 +122,29 @@ public class Clan {
     }
 
     public void handleKill(Player player) {
-        ClanPlayer cp = SevenTX.INSTANCE.getPlayer(player);
-        cp.setPoints(cp.getPoints() + 1);
-        cp.addKill();
-        cp.addKillStreak();
-        this.addPoint();
-
-    }
-
-    public void handleDeath(Player player) {
-        ClanPlayer cp = SevenTX.INSTANCE.getPlayer(player);
-        cp.addDeath();
-        cp.removeKillstreak();
+        color = Colors.getColor(points).getColor().toString();
     }
 
     public void handleLeave(Player player) {
-        // ClanPlayer get
-        // Remove points from clan
+        ClanPlayer cp = SevenTX.INSTANCE.getPlayer(player);
+        if (cp == null) return;
+        int p = cp.getPoints();
 
+        setPoints(this.points - p);
+
+        color = Colors.getColor(points).getColor().toString();
     }
 
     public void handleJoin(Player player) {
-        // ClanPlayer get
-        // Add points to clan
-        // Adjust color
+        ClanPlayer cp = SevenTX.INSTANCE.getPlayer(player);
+        if (cp == null) return;
+        int p = cp.getPoints();
+
+        setPoints(this.points + p);
+
+        color = Colors.getColor(points).getColor().toString();
     }
+
    // UUID leader, String name, String color, int points, ArrayList<UUID> members
     private static final String SAVE = "UPDATE clans SET uuid=?, name=?, color=?, points=?, members=? WHERE uuid=?";
 
@@ -175,7 +167,7 @@ public class Clan {
             StringBuilder member = new StringBuilder();
 
             boolean isFirst = true;
-            
+
             for (UUID u : members) {
                 if (isFirst) {
                     member.append(u.toString());
@@ -197,6 +189,49 @@ public class Clan {
             preparedStatement.close();
 
             SevenTX.INSTANCE.getLogger().log(Level.INFO, "Saved clan: " + name);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (st != null) {
+                    st.close();
+                }
+
+                if (con != null) {
+                    con.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public void disband() {
+        Connection con = null;
+        Statement st = null;
+        PreparedStatement preparedStatement = null;
+
+        String host = SevenTX.INSTANCE.getConfig().getString("MySQL.HostName");
+        String port = SevenTX.INSTANCE.getConfig().getString("MySQL.Port");
+        String db = SevenTX.INSTANCE.getConfig().getString("MySQL.DataBaseName");
+        String user = SevenTX.INSTANCE.getConfig().getString("MySQL.UserName");
+        String password = SevenTX.INSTANCE.getConfig().getString("MySQL.Password");
+
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + db, user, password);
+            st = con.createStatement();
+
+            String DELETE = "DELETE FROM CLANS WHERE NAME=?";
+
+            preparedStatement = con.prepareStatement(DELETE);
+
+            preparedStatement.setString(1, name);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+
+            SevenTX.INSTANCE.getLogger().log(Level.INFO, "Disbanded clan: " + name);
 
         } catch (SQLException ex) {
             ex.printStackTrace();
