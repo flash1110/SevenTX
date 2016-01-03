@@ -43,22 +43,10 @@ public class SevenTX extends JavaPlugin {
         getCommand("clanjoin").setExecutor(new ClanJoin());
         getCommand("clanleader").setExecutor(new ClanLeader());
         getCommand("clandelete").setExecutor(new ClanDelete());
+        getCommand("stats").setExecutor(new StatCommand());
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
         ClanSave.startDelayedTasks();
-
-      /*  for (Player player : Bukkit.getOnlinePlayers()) {
-            ClanPlayer p = SevenTX.INSTANCE.loadPlayer(player);
-
-            if (p != null)
-                SevenTX.INSTANCE.updatePlayer(player.getUniqueId(), p);
-
-            Clan clan = SevenTX.INSTANCE.loadClan(player);
-
-            if (clan != null)
-                SevenTX.INSTANCE.updateClan(clan.getName(), clan);
-        } */
-
     }
 
     @Override
