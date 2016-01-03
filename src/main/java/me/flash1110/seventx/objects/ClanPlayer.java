@@ -36,6 +36,10 @@ public class ClanPlayer {
         return this.clan;
     }
 
+    public void setClan(Clan clan) {
+        this.clan = clan;
+    }
+
     public int getKillStreak() {
         return this.currentKillstreak;
     }

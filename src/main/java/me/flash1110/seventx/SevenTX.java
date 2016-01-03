@@ -273,8 +273,10 @@ public class SevenTX extends JavaPlugin {
 
                 ArrayList<UUID> members = new ArrayList<>();
 
-                for (String string : s.split(",")) {
-                    members.add(UUID.fromString(string));
+                if (s.contains("-")) {
+                    for (String string : s.split(",")) {
+                        members.add(UUID.fromString(string));
+                    }
                 }
 
 
@@ -286,7 +288,6 @@ public class SevenTX extends JavaPlugin {
             }
 
         } catch (SQLException ex) {
-            getLogger().info("hey Luz3");
             ex.printStackTrace();
         } finally {
             if (con != null) {

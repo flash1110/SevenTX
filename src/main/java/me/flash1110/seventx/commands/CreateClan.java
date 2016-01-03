@@ -59,6 +59,7 @@ public class CreateClan implements CommandExecutor {
         c.save();
         player.sendMessage(ChatColor.GOLD + "Created clan titled " + ChatColor.RED + WordUtils.capitalizeFully(name));
         SevenTX.INSTANCE.updateClan(name, c);
+        cp.setClan(c);
         return true;
     }
 }
