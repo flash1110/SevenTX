@@ -10,9 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 /**
  * Created by sandleraj on 1/2/16.
  */
@@ -22,18 +19,7 @@ public class PlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         event.getPlayer().sendMessage(ChatColor.GOLD + "Contacting the SQL servers to load your data...");
 
-        Clan clan;
-        clan = SevenTX.INSTANCE.loadClan(event.getPlayer());
-        if (clan == null) {
-            clan = new Clan(event.getPlayer().getUniqueId(), "default", "WHITE", 0, new ArrayList<UUID>());
-        }
-
-        if (clan != null && !clan.getName().equals("default")) {
-            SevenTX.INSTANCE.updateClan(clan.getName(), clan);
-            Bukkit.broadcastMessage("Not null, clan loaded2");
-        }
-
-        event.getPlayer().sendMessage("sen");
+        Clan clan = SevenTX.INSTANCE.loadClan(event.getPlayer());
 
         ClanPlayer player = SevenTX.INSTANCE.loadPlayer(event.getPlayer());
         if (player != null) {
@@ -43,12 +29,6 @@ public class PlayerListener implements Listener {
 
         if (SevenTX.INSTANCE.getPlayer(event.getPlayer().getUniqueId()) != null) {
             Bukkit.broadcastMessage("Not null, Player loaded1");
-        }
-
-        if (clan.getName() == null) return;
-
-        if (SevenTX.INSTANCE.getClan(clan.getName()) != null) {
-            Bukkit.broadcastMessage("clan loaded1");
         }
 
         event.getPlayer().sendMessage(ChatColor.GREEN + "...Successfully loaded your data");

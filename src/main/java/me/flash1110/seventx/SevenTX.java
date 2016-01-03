@@ -10,7 +10,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Created by sandleraj on 1/1/16.
@@ -117,6 +119,7 @@ public class SevenTX extends JavaPlugin {
     }
 
     public void updateClan(String name, Clan clan) {
+        if (clan.getName().equals("default")) return;
         clans.put(name, clan);
     }
 
@@ -124,8 +127,8 @@ public class SevenTX extends JavaPlugin {
         clans.remove(name);
     }
 
-    private static final String INSERT = "INSERT INTO PLAYERS VALUES(id, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
-    private static final String SELECT = "SELECT uuid,kills,deaths,points,killstreak,highkill,clan FROM PLAYERS WHERE uuid=?";
+    private static final String INSERT = "INSERT INTO PLAYERS VALUES(id, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE UUID=?";
+    private static final String SELECT = "SELECT UUID,KILLS,DEATHS,POINTS,KILLSTREAK,HIGHKILL,CLAN FROM PLAYERS WHERE UUID=?";
 
     public boolean createPlayerTable() {
         boolean boo = false;
@@ -175,8 +178,8 @@ public class SevenTX extends JavaPlugin {
         return boo;
     }
 
-    private static final String INSERTCLAN = "INSERT INTO CLANS VALUES(id, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
-    private static final String SELECTCLAN = "SELECT uuid,members,points,color,name FROM CLANS WHERE uuid=?";
+    private static final String INSERTCLAN = "INSERT INTO CLANS VALUES(id, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE UUID=?";
+    private static final String SELECTCLAN = "SELECT UUID,MEMBERS,POINTS,COLOR,NAME FROM CLANS WHERE UUID=?";
 
     public boolean createClanTable() {
         boolean boo = false;
@@ -255,19 +258,26 @@ public class SevenTX extends JavaPlugin {
                 preparedStatement.setInt(3, 0);
                 preparedStatement.setString(4, "");
                 preparedStatement.setString(5, "default");
+                preparedStatement.setString(6, "default");
                 preparedStatement.executeUpdate();
             }
+
+            preparedStatement = con.prepareStatement(SELECTCLAN);
+            preparedStatement.setString(1, player.getUniqueId().toString());
 
             resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
                 UUID uuid = UUID.fromString(resultSet.getString("uuid"));
                 String s = resultSet.getString("members");
-                List<String> temp = Arrays.asList(s.substring(1, s.length() - 1).split(",\\s*"));
+
                 ArrayList<UUID> members = new ArrayList<>();
-                for (String t : temp) {
-                    members.add(UUID.fromString(t));
+
+                for (String string : s.split(",")) {
+                    members.add(UUID.fromString(string));
                 }
+
+
                 int points = resultSet.getInt("points");
                 String color = resultSet.getString("color");
                 String name = resultSet.getString("name");
@@ -321,8 +331,12 @@ public class SevenTX extends JavaPlugin {
                 preparedStatement.setInt(5, 0);
                 preparedStatement.setInt(6, 0);
                 preparedStatement.setString(7, "default");
+                preparedStatement.setString(8, player.getUniqueId().toString());
                 preparedStatement.executeUpdate();
             }
+
+            preparedStatement = con.prepareStatement(SELECT);
+            preparedStatement.setString(1, player.getUniqueId().toString());
 
             resultSet = preparedStatement.executeQuery();
 
@@ -334,13 +348,15 @@ public class SevenTX extends JavaPlugin {
                 int ks = resultSet.getInt("killstreak");
                 int high = resultSet.getInt("highkill");
                 String name = resultSet.getString("clan");
-
-                cp = new ClanPlayer(uuid, kills, deaths, points, ks, high, clans.get(name));
+                if (name.equals("default")) {
+                    cp = new ClanPlayer(uuid, kills, deaths, points, ks, high, null);
+                } else {
+                    cp = new ClanPlayer(uuid, kills, deaths, points, ks, high, clans.get(name));
+                }
             }
             preparedStatement.close();
             resultSet.close();
         } catch (SQLException ex) {
-            getLogger().info("hey Luz4");
             ex.printStackTrace();
         } finally {
             if (con != null) {

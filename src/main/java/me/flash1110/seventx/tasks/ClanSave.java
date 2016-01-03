@@ -25,7 +25,7 @@ public class ClanSave {
                     for (Clan clan : SevenTX.INSTANCE.getClans().values()) {
                         if (clan == null) continue;
                         clan.save();
-                        Bukkit.broadcastMessage(ChatColor.GOLD + "Test message: Saved" + clan.getName());
+                        Bukkit.broadcastMessage(ChatColor.GOLD + "Test message: Saved " + clan.getName());
                     }
 
                     Bukkit.broadcastMessage(ChatColor.GOLD + "... " + ChatColor.GREEN + "successfully " + ChatColor.GOLD + "saved clan data.");

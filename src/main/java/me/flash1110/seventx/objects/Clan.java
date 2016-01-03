@@ -172,12 +172,27 @@ public class Clan {
             con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + db, user, password);
             st = con.createStatement();
 
+            StringBuilder member = new StringBuilder();
+
+            boolean isFirst = true;
+            
+            for (UUID u : members) {
+                if (isFirst) {
+                    member.append(u.toString());
+                    isFirst = false;
+                } else {
+                    member.append(u.toString() + ",");
+                }
+            }
+
+            String memberString = member.toString();
+
             preparedStatement = con.prepareStatement(SAVE);
             preparedStatement.setString(1, leader.toString());
             preparedStatement.setString(2, name);
             preparedStatement.setString(3, color);
             preparedStatement.setInt(4, points);
-            preparedStatement.setString(5, members.toString());
+            preparedStatement.setString(5, memberString);
             preparedStatement.execute();
             preparedStatement.close();
 
