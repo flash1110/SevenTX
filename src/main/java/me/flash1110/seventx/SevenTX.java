@@ -29,8 +29,10 @@ public class SevenTX extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveConfig();
 
-        createClanTable();
-        createPlayerTable();
+        if (createClanTable())
+            getLogger().info("Loaded clan table");
+        if (createPlayerTable()) ;
+        getLogger().info("Loaded player table");
 
         getCommand("clancreate").setExecutor(new CreateClan());
         getCommand("claninvite").setExecutor(new InviteCommand());
@@ -40,8 +42,20 @@ public class SevenTX extends JavaPlugin {
         getCommand("clanleader").setExecutor(new ClanLeader());
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
-        Thread thread = new Thread(new ClanSave());
-        thread.start();
+        ClanSave.startDelayedTasks();
+
+      /*  for (Player player : Bukkit.getOnlinePlayers()) {
+            ClanPlayer p = SevenTX.INSTANCE.loadPlayer(player);
+
+            if (p != null)
+                SevenTX.INSTANCE.updatePlayer(player.getUniqueId(), p);
+
+            Clan clan = SevenTX.INSTANCE.loadClan(player);
+
+            if (clan != null)
+                SevenTX.INSTANCE.updateClan(clan.getName(), clan);
+        } */
+
     }
 
     @Override
@@ -79,10 +93,6 @@ public class SevenTX extends JavaPlugin {
     }
 
     public void updatePlayer(UUID uuid, ClanPlayer player) {
-        if (players.containsKey(uuid)) {
-            players.remove(uuid);
-        }
-
         players.put(uuid, player);
     }
 
@@ -107,10 +117,6 @@ public class SevenTX extends JavaPlugin {
     }
 
     public void updateClan(String name, Clan clan) {
-        if (clans.containsKey(name)) {
-            clans.remove(name);
-        }
-
         clans.put(name, clan);
     }
 
@@ -118,10 +124,11 @@ public class SevenTX extends JavaPlugin {
         clans.remove(name);
     }
 
-    private static final String INSERT = "INSERT INTO players VALUES(id, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
-    private static final String SELECT = "SELECT uuid,kills,deaths,points,killstreak,highkill,clan FROM players WHERE uuid=?";
+    private static final String INSERT = "INSERT INTO PLAYERS VALUES(id, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
+    private static final String SELECT = "SELECT uuid,kills,deaths,points,killstreak,highkill,clan FROM PLAYERS WHERE uuid=?";
 
-    public void createPlayerTable() {
+    public boolean createPlayerTable() {
+        boolean boo = false;
         Connection con = null;
         Statement st = null;
 
@@ -146,8 +153,10 @@ public class SevenTX extends JavaPlugin {
                     "KILLSTREAK INT," +
                     "HIGHKILL INT," +
                     "CLAN TEXT);");
+            boo = true;
         } catch (SQLException ex) {
             ex.printStackTrace();
+            boo = false;
         } finally {
             try {
                 if (st != null) {
@@ -160,14 +169,17 @@ public class SevenTX extends JavaPlugin {
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
+                boo = false;
             }
         }
+        return boo;
     }
 
-    private static final String INSERTCLAN = "INSERT INTO clans VALUES(id, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
-    private static final String SELECTCLAN = "SELECT uuid,members,points,color,name FROM clans WHERE uuid=?";
+    private static final String INSERTCLAN = "INSERT INTO CLANS VALUES(id, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
+    private static final String SELECTCLAN = "SELECT uuid,members,points,color,name FROM CLANS WHERE uuid=?";
 
-    public void createClanTable() {
+    public boolean createClanTable() {
+        boolean boo = false;
         Connection con = null;
         Statement st = null;
 
@@ -190,8 +202,10 @@ public class SevenTX extends JavaPlugin {
                     "POINTS INT," +
                     "COLOR TEXT," +
                     "NAME TEXT);");
+            boo = true;
         } catch (SQLException ex) {
             ex.printStackTrace();
+            boo = false;
         } finally {
             try {
                 if (st != null) {
@@ -204,13 +218,15 @@ public class SevenTX extends JavaPlugin {
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
+                boo = false;
             }
         }
+
+        return boo;
     }
 
     public Clan loadClan(Player player) {
         Connection con = null;
-        Statement st = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         Clan clan = null;
@@ -223,7 +239,9 @@ public class SevenTX extends JavaPlugin {
 
         try {
             con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + db, user, password);
-            st = con.createStatement();
+
+            //private static final String INSERTCLAN = "INSERT INTO CLANS VALUES(id, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
+            //private static final String SELECTCLAN = "SELECT uuid,members,points,color,name FROM CLANS WHERE uuid=?";
 
             preparedStatement = con.prepareStatement(SELECTCLAN);
             preparedStatement.setString(1, player.getUniqueId().toString());
@@ -231,16 +249,16 @@ public class SevenTX extends JavaPlugin {
             resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) {
-              /*  preparedStatement = con.prepareStatement(INSERTCLAN);
+                preparedStatement = con.prepareStatement(INSERTCLAN);
                 preparedStatement.setString(1, player.getUniqueId().toString());
-                preparedStatement.setString(2, "");
+                preparedStatement.setString(2, "{}");
                 preparedStatement.setInt(3, 0);
-                preparedStatement.setString(4, "WHITE");
-                preparedStatement.setString(5, "");
-                preparedStatement.executeUpdate(); */
+                preparedStatement.setString(4, "");
+                preparedStatement.setString(5, "default");
+                preparedStatement.executeUpdate();
             }
 
-         //   resultSet = preparedStatement.executeQuery();
+            resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
                 UUID uuid = UUID.fromString(resultSet.getString("uuid"));
@@ -258,6 +276,7 @@ public class SevenTX extends JavaPlugin {
             }
 
         } catch (SQLException ex) {
+            getLogger().info("hey Luz3");
             ex.printStackTrace();
         } finally {
             if (con != null) {
@@ -301,7 +320,7 @@ public class SevenTX extends JavaPlugin {
                 preparedStatement.setInt(4, 0);
                 preparedStatement.setInt(5, 0);
                 preparedStatement.setInt(6, 0);
-                preparedStatement.setString(7, "");
+                preparedStatement.setString(7, "default");
                 preparedStatement.executeUpdate();
             }
 
@@ -321,6 +340,7 @@ public class SevenTX extends JavaPlugin {
             preparedStatement.close();
             resultSet.close();
         } catch (SQLException ex) {
+            getLogger().info("hey Luz4");
             ex.printStackTrace();
         } finally {
             if (con != null) {
